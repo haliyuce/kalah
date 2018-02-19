@@ -43,28 +43,79 @@ public class PlayerTest {
     }
 
     @Test
-    public void should_ask_a_game_to_join_and_get_rejected() {
+    public void should_ask_a_game_to_join_and_get_rejected() throws NegativeGameResponseException {
 
         //Given
         Player playerGameCreator = new Player("player1");
-        Player playerGameAttendor = new Player("player1");
+        Player playerGameAttender = new Player("player1");
 
-        Player playerGameJoinDemander = new Player("player1");
+        Player rejectedPlayer = new Player("player1");
 
         //When
         Game game = playerGameCreator.createGame();
-        try {
-            boolean responseAccepted = playerGameAttendor.askToJoinGame(game.getId());
-            boolean responseRejected = playerGameJoinDemander.askToJoinGame(game.getId());
 
-            //Then
-            assertTrue(responseAccepted);
-            assertFalse(responseRejected);
-        } catch (Throwable e) {
-            //No exception is expected
-            e.printStackTrace();
-        }
+        boolean responseAccepted = playerGameAttender.askToJoinGame(game.getId());
+        boolean responseRejected = rejectedPlayer.askToJoinGame(game.getId());
 
+        //Then
+        assertTrue(responseAccepted);
+        assertFalse(responseRejected);
+
+    }
+
+    @Test(expected = NegativeGameResponseException.class)
+    public void should_have_an_exception_on_awaiting_player_game() throws NegativeGameResponseException {
+        //given
+        Player player = new Player("dummy1");
+        player.createGame();
+
+        //when
+        player.makeMove(100, 0, 0);
+
+        //then
+    }
+
+    @Test
+    public void should_make_a_successful_move() throws NegativeGameResponseException{
+        //given
+        Player player = new Player("dummy1");
+        Game game = player.createGame();
+
+        Player player2 = new Player("dummy2");
+        player2.askToJoinGame(game.getId());
+
+        //when
+        player.makeMove(game.getId(), 0, 0);
+
+        //then
+        assertEquals(game.getBoard().getWestKalah(), 1);
+
+    }
+
+    @Test
+    public void should_win_after_this_move() throws NegativeGameResponseException{
+
+        //given
+        Player player = new Player("dummy1");
+        Game game = player.createGame();
+
+        Player player2 = new Player("dummy2");
+        player2.askToJoinGame(game.getId());
+
+        //when
+        player2.makeMove(game.getId(),3,1);
+        player.makeMove(game.getId(),4,1);
+        player2.makeMove(game.getId(),5,1);
+        player.makeMove(game.getId(),0,1);
+        player2.makeMove(game.getId(),1,1);
+        player.makeMove(game.getId(),2,1);
+        player2.makeMove(game.getId(),3,1);
+        player.makeMove(game.getId(),4,1);
+        player2.makeMove(game.getId(),5,1);
+
+        //then
+        assertEquals(game.getState(), Game.GameState.FINISHED);
+        assertEquals(game.getWinner(), player);
 
     }
 

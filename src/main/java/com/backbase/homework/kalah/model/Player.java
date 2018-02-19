@@ -1,7 +1,9 @@
 package com.backbase.homework.kalah.model;
 
 import com.backbase.homework.kalah.exception.NegativeGameResponseException;
+import lombok.Data;
 
+@Data
 public class Player {
 
     private int id;
@@ -12,8 +14,7 @@ public class Player {
     }
 
     public Game createGame() {
-        Game newGame = ActiveGamePool.createNewGame(this);
-        return newGame;
+        return ActiveGamePool.createNewGame(this);
     }
 
     public boolean askToJoinGame(int gameId) throws NegativeGameResponseException {
@@ -23,6 +24,11 @@ public class Player {
             throw new NegativeGameResponseException("Game not found");
         }
 
-        return game.askToJoinGame(this);
+        return game.isAvailable(this);
+    }
+
+    public void makeMove(int gameId, int startPitIndexX, int startPitIndexY) throws NegativeGameResponseException {
+        Move move = new Move(startPitIndexX, startPitIndexY, this);
+        ActiveGamePool.getActiveGame(gameId).applyMove(move);
     }
 }
