@@ -1,9 +1,13 @@
 package com.backbase.homework.kalah.model;
 
 import com.backbase.homework.kalah.exception.NegativeGameResponseException;
-import com.backbase.homework.kalah.model.rule.Rule;
-import com.backbase.homework.kalah.model.rule.impl.LastStoneIntoKalahRule;
-import com.backbase.homework.kalah.model.rule.impl.ParallelEmptyPitRule;
+import com.backbase.homework.kalah.service.rule.PostProcessors;
+import com.backbase.homework.kalah.service.rule.impl.LastStoneIntoKalahPostProcessor;
+import com.backbase.homework.kalah.service.rule.impl.ParallelEmptyPitPostProcessor;
+import com.backbase.homework.kalah.service.validation.Validator;
+import com.backbase.homework.kalah.service.validation.impl.CheckGameEndValidator;
+import com.backbase.homework.kalah.service.validation.impl.RightUserTurnValidator;
+import com.backbase.homework.kalah.service.validation.impl.ValidMoveValidation;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -23,7 +27,6 @@ public class Game {
     private Player firstPlayer;
     private Player secondPlayer;
 
-    @Setter(AccessLevel.NONE)
     private Player turn = firstPlayer;
 
     @Setter(AccessLevel.NONE)
@@ -31,14 +34,22 @@ public class Game {
 
     private GameState state = GameState.AWAITING_PLAYER;
 
-    private List<Rule> rules;
+    private List<PostProcessors> postProcessors;
+
+    private List<Validator> validators;
 
     public Game(int gameId) {
         this.id = gameId;
         this.board = new Board();
-        this.rules = new ArrayList<Rule>() {{
-            add(new LastStoneIntoKalahRule());
-            add(new ParallelEmptyPitRule());
+        this.postProcessors = new ArrayList<PostProcessors>() {{
+            add(new LastStoneIntoKalahPostProcessor());
+            add(new ParallelEmptyPitPostProcessor());
+        }};
+
+        this.validators = new ArrayList<Validator>() {{
+           add(new CheckGameEndValidator());
+           add(new RightUserTurnValidator());
+           add(new ValidMoveValidation());
         }};
     }
 
@@ -67,15 +78,15 @@ public class Game {
 
     public synchronized void applyMove(Move move) throws NegativeGameResponseException{
 
-        if(winner != null) {
-            throw new NegativeGameResponseException("Game is already finished");
-        }
-
         move.setPlayerOrder(move.getPlayer().equals(firstPlayer)?1:2);
+
+        for(Validator validator: validators) {
+            validator.validate(this, move);
+        }
 
         MoveResponse lastStoneAction = this.board.move(move);
 
-        this.rules.forEach(rule -> rule.checkAndApply(board, lastStoneAction, move.getPlayer(), turn));
+        this.postProcessors.forEach(processor -> processor.checkAndApply(this, lastStoneAction, move.getPlayer()));
 
         checkStatus();
     }

@@ -12,7 +12,7 @@ public class GameTest {
 
         //given
         Game game = new Game(1);
-        Player person = new Player("dummy");
+        Player person = new Player("dummy",1);
 
         //when
         boolean response = game.isAvailable(person);
@@ -27,9 +27,9 @@ public class GameTest {
 
         //given
         Game game = new Game(1);
-        Player person1 = new Player("dummy1");
-        Player person2 = new Player("dummy2");
-        Player person3 = new Player("dummy3");
+        Player person1 = new Player("dummy1", 1);
+        Player person2 = new Player("dummy2",2);
+        Player person3 = new Player("dummy3",3);
 
         //when
         boolean response1 = game.isAvailable(person1);
@@ -47,17 +47,17 @@ public class GameTest {
     public void should_add_the_stones_to_kalah_if_parallel_pit_is_empty_and_last_stone_is_on_it() throws NegativeGameResponseException {
 
         //given
-        Player player1 = new Player("dummy1");
+        Player player1 = new Player("dummy1", 1);
         Game game = player1.createGame();
-        Player player2 = new Player("dummy2");
+        Player player2 = new Player("dummy2", 2);
         player2.askToJoinGame(game.getId());
 
         //when
-        player1.makeMove(game.getId(), 0,1);
-        player2.makeMove(game.getId(), 4, 0);
+        player1.makeMove(game.getId(), 1,0);
+        player2.makeMove(game.getId(), 5, 1);
 
         //then
-        assertEquals(game.getBoard().getEastKalah(), 7);
+        assertEquals(game.getBoard().getWestKalah(), 9);
 
     }
 

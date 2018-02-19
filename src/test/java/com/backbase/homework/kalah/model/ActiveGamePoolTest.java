@@ -11,7 +11,7 @@ public class ActiveGamePoolTest {
     public void should_create_game() {
 
         //given
-        Player player =  new Player("dummy1");
+        Player player =  new Player("dummy1",1);
 
         //when
         Game game = ActiveGamePool.createNewGame(player);
@@ -24,7 +24,7 @@ public class ActiveGamePoolTest {
     public void should_get_existing_game() throws NegativeGameResponseException{
 
         //given
-        Player player =  new Player("dummy1");
+        Player player =  new Player("dummy1",1);
 
         //when
         Game game = ActiveGamePool.createNewGame(player);
@@ -51,7 +51,7 @@ public class ActiveGamePoolTest {
     public void should_get_all_active_games_list() {
         //Given
         //given
-        Player player =  new Player("dummy1");
+        Player player =  new Player("dummy1",1);
 
         //when
         ActiveGamePool.createNewGame(player);

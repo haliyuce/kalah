@@ -29,16 +29,18 @@ public class Board {
 
         int stoneCount = pits[move.getStartPitIndexX()][move.getStartPitIndexY()];
 
-        pits[move.getStartPitIndexX()][move.getStartPitIndexY()] = 0;
+        resetPitStoneCount(move.getStartPitIndexX(), move.getStartPitIndexY());
 
         for (int i=0; i<stoneCount-1; i++) {
             if(x == 5 && y == 1 ) { // if kalah turn is on the right border
                 eastKalah = move.getPlayerOrder() == 2?eastKalah +1:eastKalah; // add one stone to kalah
                 y = 0; //reSet cursor on y line
+                x = 6;
             } else {
                 if(x == 0 && y == 0) { // if kalah turn is on the left border
                     westKalah = move.getPlayerOrder() == 1? westKalah + 1: westKalah; // add one stone to kalah
                     y = 1; //reset cursor on y line
+                    x = -1;
                 } else {
                     x = y == 1? x+1: x-1; // if cursor is on upper side, decrease, else increase
                     pits[x][y] ++;
@@ -57,8 +59,9 @@ public class Board {
                 westKalah ++; // add one stone to kalah
                 moveResponse = new MoveResponse(0,  0, false, true);
             } else {
-                moveResponse = new MoveResponse(x,  y, false, false);
+                x = y == 1? x+1: x-1; // if cursor is on upper side, decrease, else increase
                 pits[x][y] ++;
+                moveResponse = new MoveResponse(x,  y, false, false);
             }
         }
 
