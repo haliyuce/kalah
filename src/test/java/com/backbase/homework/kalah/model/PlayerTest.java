@@ -1,10 +1,16 @@
 package com.backbase.homework.kalah.model;
 
 import com.backbase.homework.kalah.exception.NegativeGameResponseException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import static org.junit.Assert.*;
 
 public class PlayerTest {
+
+    @Rule
+    public ExpectedException expectedEx = ExpectedException.none();
 
     @Test
     public void should_be_able_to_create_a_new_game() {
@@ -63,14 +69,18 @@ public class PlayerTest {
 
     }
 
-    @Test(expected = NegativeGameResponseException.class)
+    @Test
     public void should_have_an_exception_on_awaiting_player_game() throws NegativeGameResponseException {
+
+        expectedEx.expect(NegativeGameResponseException.class);
+        expectedEx.expectMessage("Game needs another player to start");
+
         //given
         Player player = new Player("dummy1", 1);
-        player.createGame();
+        Game game = player.createGame();
 
         //when
-        player.makeMove(100, 0, 0);
+        player.makeMove(game.getId(), 0, 0);
 
         //then
     }
@@ -102,16 +112,15 @@ public class PlayerTest {
         Player player2 = new Player("dummy2", 2);
         player2.askToJoinGame(game.getId());
 
+        game.getBoard().resetPitStoneCount(1,0);
+        game.getBoard().resetPitStoneCount(2,0);
+        game.getBoard().resetPitStoneCount(3,0);
+        game.getBoard().resetPitStoneCount(4,0);
+        game.getBoard().resetPitStoneCount(5,0);
+        game.getBoard().setWestKalah(30);
+
         //when
-        player2.makeMove(game.getId(),3,1);
-        player.makeMove(game.getId(),4,1);
-        player2.makeMove(game.getId(),5,1);
-        player.makeMove(game.getId(),0,1);
-        player2.makeMove(game.getId(),1,1);
-        player.makeMove(game.getId(),2,1);
-        player2.makeMove(game.getId(),3,1);
-        player.makeMove(game.getId(),4,1);
-        player2.makeMove(game.getId(),5,1);
+        player.makeMove(game.getId(),0,0);
 
         //then
         assertEquals(game.getState(), Game.GameState.FINISHED);

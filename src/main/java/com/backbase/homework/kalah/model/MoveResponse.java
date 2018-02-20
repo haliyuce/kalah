@@ -20,6 +20,6 @@ public class MoveResponse {
     }
 
     public boolean isOnKalah() {
-        return onWestKalah && onEastKalah;
+        return onWestKalah || onEastKalah;
     }
 }

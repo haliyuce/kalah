@@ -19,21 +19,6 @@ public class ActiveGamePool {
         return newGame;
     }
 
-    public static Game getActiveGame(int gameId) throws NegativeGameResponseException {
-        int index = activeGames.indexOf(new Game(gameId));
-
-        if(index > -1) {
-            Game game = activeGames.get(index);
-            if(game.getState() == Game.GameState.ACTIVE) {
-                return activeGames.get(index);
-            }
-
-            throw new NegativeGameResponseException("Game is already finished!!");
-        }
-
-        throw new NegativeGameResponseException("No game found with this id!!");
-    }
-
     public static Game getGame(int gameId) throws NegativeGameResponseException {
         int index = activeGames.indexOf(new Game(gameId));
 

@@ -2,10 +2,11 @@ package com.backbase.homework.kalah.model;
 
 import com.backbase.homework.kalah.exception.NegativeGameResponseException;
 import com.backbase.homework.kalah.service.rule.PostProcessors;
+import com.backbase.homework.kalah.service.rule.impl.CheckGameEndPostProcessor;
 import com.backbase.homework.kalah.service.rule.impl.LastStoneIntoKalahPostProcessor;
 import com.backbase.homework.kalah.service.rule.impl.ParallelEmptyPitPostProcessor;
 import com.backbase.homework.kalah.service.validation.Validator;
-import com.backbase.homework.kalah.service.validation.impl.CheckGameEndValidator;
+import com.backbase.homework.kalah.service.validation.impl.CheckGameStateValidator;
 import com.backbase.homework.kalah.service.validation.impl.RightUserTurnValidator;
 import com.backbase.homework.kalah.service.validation.impl.ValidMoveValidation;
 import lombok.AccessLevel;
@@ -29,7 +30,6 @@ public class Game {
 
     private Player turn = firstPlayer;
 
-    @Setter(AccessLevel.NONE)
     private Player winner;
 
     private GameState state = GameState.AWAITING_PLAYER;
@@ -44,10 +44,11 @@ public class Game {
         this.postProcessors = new ArrayList<PostProcessors>() {{
             add(new LastStoneIntoKalahPostProcessor());
             add(new ParallelEmptyPitPostProcessor());
+            add(new CheckGameEndPostProcessor());
         }};
 
         this.validators = new ArrayList<Validator>() {{
-           add(new CheckGameEndValidator());
+           add(new CheckGameStateValidator());
            add(new RightUserTurnValidator());
            add(new ValidMoveValidation());
         }};
@@ -88,42 +89,11 @@ public class Game {
 
         this.postProcessors.forEach(processor -> processor.checkAndApply(this, lastStoneAction, move.getPlayer()));
 
-        checkStatus();
     }
 
     public void setFirstPlayer(Player firstPlayer) {
         this.firstPlayer = firstPlayer;
         this.turn = this.firstPlayer;
-    }
-
-    private void checkStatus() {
-        boolean winner = true;
-        for (int i=0; i<6;i++) {
-            if(this.board.getPitStoneCount(i, 0) != 0) {
-                winner = false;
-                break;
-            }
-        }
-
-        if(winner) {
-            this.winner = this.board.getWestKalah()>30?firstPlayer:secondPlayer;
-            this.state = GameState.FINISHED;
-            return;
-        }
-
-        winner = true;
-
-        for (int i=0; i<6;i++) {
-            if(this.board.getPitStoneCount(i, 1) != 0) {
-                winner = false;
-                break;
-            }
-        }
-
-        if(winner) {
-            this.winner = this.board.getEastKalah()>30?secondPlayer:firstPlayer;
-            this.state = GameState.FINISHED;
-        }
     }
 
     @Override

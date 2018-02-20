@@ -32,7 +32,7 @@ public class Player {
 
     public void makeMove(int gameId, int startPitIndexX, int startPitIndexY) throws NegativeGameResponseException {
         Move move = new Move(startPitIndexX, startPitIndexY, this);
-        ActiveGamePool.getActiveGame(gameId).applyMove(move);
+        ActiveGamePool.getGame(gameId).applyMove(move);
     }
 
     @Override

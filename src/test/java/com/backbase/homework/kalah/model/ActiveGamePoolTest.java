@@ -1,11 +1,16 @@
 package com.backbase.homework.kalah.model;
 
 import com.backbase.homework.kalah.exception.NegativeGameResponseException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.*;
 
 public class ActiveGamePoolTest {
+
+    @Rule
+    public ExpectedException expectedEx = ExpectedException.none();
 
     @Test
     public void should_create_game() {
@@ -34,8 +39,11 @@ public class ActiveGamePoolTest {
 
     }
 
-    @Test(expected = NegativeGameResponseException.class)
+    @Test
     public void should_expect_null_on_non_existing_game() throws NegativeGameResponseException {
+
+        expectedEx.expect(NegativeGameResponseException.class);
+        expectedEx.expectMessage("No game found with this id!!");
 
         //given
 
@@ -43,7 +51,7 @@ public class ActiveGamePoolTest {
 
         //then
 
-        assertNull(ActiveGamePool.getGame(33));
+        assertNull(ActiveGamePool.getGame(-1));
 
     }
 
