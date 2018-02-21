@@ -13,10 +13,10 @@ public class GameTest extends BaseTest {
     public void should_equals_and_hashcode_method_give_true_if_games_are_identical() {
         //Given
         Player player = playerRepository.createPlayer("player1");
-        Game game1 = gameRepository.createNewGame(player);
-        Game game2 = gameRepository.createNewGame(player);
 
         //when
+        Game game1 = gameRepository.createNewGame(player);
+        Game game2 = gameRepository.createNewGame(player);
         game2.setId(game1.getId());
 
         //then
@@ -29,9 +29,9 @@ public class GameTest extends BaseTest {
     public void should_winner_should_be_null_at_creation() {
         //Given
         Player player = playerRepository.createPlayer("player1");
-        Game game = gameRepository.createNewGame(player);
 
         //when
+        Game game = gameRepository.createNewGame(player);
 
         //then
         assertNull(game.getWinner());
@@ -42,9 +42,9 @@ public class GameTest extends BaseTest {
     public void should_game_id_be_initialized() {
         //Given
         Player player = playerRepository.createPlayer("player1");
-        Game game = gameRepository.createNewGame(player);
 
         //when
+        Game game = gameRepository.createNewGame(player);
 
         //then
         assertTrue(game.getId()>-1);
@@ -55,9 +55,9 @@ public class GameTest extends BaseTest {
     public void should_validators_be_set_at_game_creation() {
         //Given
         Player player = playerRepository.createPlayer("player1");
-        Game game = gameRepository.createNewGame(player);
 
         //when
+        Game game = gameRepository.createNewGame(player);
 
         //then
         assertTrue(game.getValidators().size()>0);
@@ -68,9 +68,9 @@ public class GameTest extends BaseTest {
     public void should_postprocessors_be_set_at_game_creation() {
         //Given
         Player player = playerRepository.createPlayer("player1");
-        Game game = gameRepository.createNewGame(player);
 
         //when
+        Game game = gameRepository.createNewGame(player);
 
         //then
         assertTrue(game.getPostProcessors().size()>0);
@@ -82,9 +82,9 @@ public class GameTest extends BaseTest {
 
         //given
         Player player = playerRepository.createPlayer("player1");
-        Game game = gameRepository.createNewGame(player);
 
         //when
+        Game game = gameRepository.createNewGame(player);
         boolean response = game.askToJoin(player);
 
         //then

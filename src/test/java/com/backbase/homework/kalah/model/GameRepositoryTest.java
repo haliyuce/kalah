@@ -12,9 +12,9 @@ public class GameRepositoryTest extends BaseTest {
 
         //given
         Player player = playerRepository.createPlayer("player1");
-        Game game = gameRepository.createNewGame(player);
 
         //when
+        Game game = gameRepository.createNewGame(player);
 
         //then
         assertNotNull(game);
@@ -25,9 +25,9 @@ public class GameRepositoryTest extends BaseTest {
 
         //given
         Player player = playerRepository.createPlayer("player1");
-        Game game = gameRepository.createNewGame(player);
 
         //when
+        Game game = gameRepository.createNewGame(player);
 
         //Then
         assertNotNull(gameRepository.getGame(game.getId()));
@@ -43,10 +43,10 @@ public class GameRepositoryTest extends BaseTest {
         //given
 
         //when
+        Game game = gameRepository.getGame(-1);
 
         //then
-
-        assertNull(gameRepository.getGame(-1));
+        assertNull(game);
 
     }
 
