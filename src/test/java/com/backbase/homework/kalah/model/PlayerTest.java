@@ -1,24 +1,69 @@
 package com.backbase.homework.kalah.model;
 
+import com.backbase.homework.kalah.exception.ImmatureGameStateException;
 import com.backbase.homework.kalah.exception.NegativeGameResponseException;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class PlayerTest {
+public class PlayerTest extends BaseTest{
 
-    @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
+    @Test
+    public void should_id_attr_give_validation_errors_if_id_not_valid() {
+        //Given
+        Player player = new Player( "dummy1",-1);
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
+        //when
+        Set<ConstraintViolation<Player>> violations = validator.validate(player);
+
+        //then
+        assertFalse(violations.isEmpty());
+
+    }
+
+    @Test
+    public void should_name_attribute_give_validation_errors_if_id_not_valid() {
+        //Given
+        Player player = new Player( null,5);
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
+        //when
+        Set<ConstraintViolation<Player>> violations = validator.validate(player);
+
+        //then
+        assertFalse(violations.isEmpty());
+
+    }
+
+    @Test
+    public void should_equals_hashcode_give_expected_values() {
+        //Given
+        Player player1 = new Player( "dummy",5);
+        Player player2 = new Player( "dummy",5);
+
+        //when
+        boolean resp = player1.equals(player2);
+        boolean hashcodeResp = player1.hashCode() == player2.hashCode();
+
+        //then
+        assertTrue(resp);
+        assertTrue(hashcodeResp);
+    }
 
     @Test
     public void should_be_able_to_create_a_new_game() {
         //Given
-        Player player = new Player("player1", 1);
+        Player player = playerRepository.createPlayer("player1");
 
         //When
-        Game game = player.createGame();
+        Game game = gameRepository.createNewGame(player);
 
         //Then
         assertNotNull(game);
@@ -31,17 +76,15 @@ public class PlayerTest {
     public void should_ask_a_game_to_join_and_be_successful() {
 
         //Given
-        Player player = new Player("player1", 1);
+        Player player = playerRepository.createPlayer("player1");
+
+        Player player2 = playerRepository.createPlayer("player2");
 
         //When
-        player.createGame();
+        Game game = gameRepository.createNewGame(player);
         boolean response = false;
-        try {
-            response = player.askToJoinGame(1);
-        } catch (NegativeGameResponseException e) {
-            //No exception is expected
-            e.printStackTrace();
-        }
+
+        response = game.askToJoin(player2);
 
         //Then
         assertTrue(response);
@@ -52,16 +95,16 @@ public class PlayerTest {
     public void should_ask_a_game_to_join_and_get_rejected() throws NegativeGameResponseException {
 
         //Given
-        Player playerGameCreator = new Player("player1", 1);
-        Player playerGameAttender = new Player("player2", 2);
+        Player playerGameCreator = playerRepository.createPlayer("player1");
+        Player playerGameAttender = playerRepository.createPlayer("player2");
 
-        Player rejectedPlayer = new Player("player3", 3);
+        Player rejectedPlayer = playerRepository.createPlayer("player3");
 
         //When
-        Game game = playerGameCreator.createGame();
+        Game game = gameRepository.createNewGame(playerGameCreator);
 
-        boolean responseAccepted = playerGameAttender.askToJoinGame(game.getId());
-        boolean responseRejected = rejectedPlayer.askToJoinGame(game.getId());
+        boolean responseAccepted = game.askToJoin(playerGameAttender);
+        boolean responseRejected = game.askToJoin(rejectedPlayer);
 
         //Then
         assertTrue(responseAccepted);
@@ -72,15 +115,15 @@ public class PlayerTest {
     @Test
     public void should_have_an_exception_on_awaiting_player_game() throws NegativeGameResponseException {
 
-        expectedEx.expect(NegativeGameResponseException.class);
+        expectedEx.expect(ImmatureGameStateException.class);
         expectedEx.expectMessage("Game needs another player to start");
 
         //given
-        Player player = new Player("dummy1", 1);
-        Game game = player.createGame();
+        Player player = playerRepository.createPlayer("dummy1");
+        Game game = gameRepository.createNewGame(player);
 
         //when
-        player.makeMove(game.getId(), 0, 0);
+        game.applyMove(new Move(0, 0, player));
 
         //then
     }
@@ -88,14 +131,14 @@ public class PlayerTest {
     @Test
     public void should_make_a_successful_move() throws NegativeGameResponseException{
         //given
-        Player player = new Player("dummy1", 1);
-        Game game = player.createGame();
+        Player player = playerRepository.createPlayer("dummy1");
+        Game game = gameRepository.createNewGame(player);
 
-        Player player2 = new Player("dummy2", 2);
-        player2.askToJoinGame(game.getId());
+        Player player2 = playerRepository.createPlayer("dummy2");
+        game.askToJoin(player2);
 
         //when
-        player.makeMove(game.getId(), 0, 0);
+        game.applyMove(new Move(0, 0, player));
 
         //then
         assertEquals(game.getBoard().getWestKalah(), 1);
@@ -106,11 +149,11 @@ public class PlayerTest {
     public void should_win_after_this_move() throws NegativeGameResponseException{
 
         //given
-        Player player = new Player("dummy1", 1);
-        Game game = player.createGame();
+        Player player = playerRepository.createPlayer("dummy1");
+        Game game = gameRepository.createNewGame(player);
 
-        Player player2 = new Player("dummy2", 2);
-        player2.askToJoinGame(game.getId());
+        Player player2 = playerRepository.createPlayer("dummy2");
+        game.askToJoin(player2);
 
         game.getBoard().resetPitStoneCount(1,0);
         game.getBoard().resetPitStoneCount(2,0);
@@ -120,7 +163,7 @@ public class PlayerTest {
         game.getBoard().setWestKalah(30);
 
         //when
-        player.makeMove(game.getId(),0,0);
+        game.applyMove(new Move(0, 0, player));
 
         //then
         assertEquals(game.getState(), Game.GameState.FINISHED);

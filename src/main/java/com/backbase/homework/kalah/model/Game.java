@@ -20,7 +20,7 @@ import java.util.Objects;
 @Data
 public class Game {
 
-    private int id;
+    private int id = -1;
 
     @Setter(AccessLevel.NONE)
     private Board board;
@@ -62,11 +62,7 @@ public class Game {
         return board;
     }
 
-    public boolean isAvailable(Player player) {
-        if(this.firstPlayer == null) {
-            this.firstPlayer = player;
-            return true;
-        }
+    public boolean askToJoin(Player player) {
 
         if(this.secondPlayer == null) {
             this.secondPlayer = player;
