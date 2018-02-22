@@ -19,4 +19,4 @@ Domain diagram illustrated below:
 
 <b>NOTE</b>
 
-Unit tests are not 100% done
+Unit/Integration tests are not 100% done. I tried to give samples for each of them in tests.
